@@ -3,201 +3,11 @@
 <head>
   <title>Civ3 Show-and-Tell JSON/d3/SVG Map</title>
   <link rel="stylesheet" type="text/css" href="svgmap.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-<script>
-
-var resources = {
-    0x08: '\uD83C\uDF47', // "#myWines" 
-    0x09: 'Furs', // Furs
-    0x0c: 'Spices', // Spices
-    0x0d: '\uD83D\uDC18', // Unicode elephant // Ivory
-    0x0a: 'Dyes', // Dyes
-    0x0b: 'Incense', // Incense
-    0x0e: 'Silks', // Silks
-    0x0f: '\uD83D\uDC8E', // Gems
-    // 0x10: '\uD83D\uDC33', // Spouting whale // Whales
-    0x10: '\uD83D\uDC0B', // Whales
-    0x11: '\uD800\uDC82', // Deer
-    0x12: '\uD83D\uDC1F', // Fish
-    0x13: '\uD83D\uDC04', // Cow
-    0x14: 'Wheat', // Wheat
-    0x15: 'Gold', // Gold
-    0x16: 'Sugar', // Sugar
-    0x17: '\uD83C\uDF4C', // Trop.Fruit
-    // 0x18: '\uD83C\uDFDD', // Unicode desert island // Oasis
-    // 0x18: 'Oasis', // Oasis
-    0x18: '\uD83C\uDF34', // Unicode palm tree // Oasis
-    // 0x19: 'Tobacco' // Tobacco
-    0x19: '\uD83D\uDEAC' // Unicode smoking // Tobacco
-}
-// console.log('Resource object test:');
-// Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
-
-var overlay = {
-    0x50: '#myHill',
-    0x60: '#myMountain',
-    0x70: '#myForest',
-    0x80: '#myJungle',
-    0x90: '#myMarsh',
-    0xa0: '#myVolcano'
-}
-
-    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
-    var spoilmask = 0x2;
-    // spoilmask = 0x4;
-    // spoilmask = 0x8;
-    // spoilmask = 0x10;
-    // spoilmask = 0xffff;
-
-// Declaring global vars because of scope difference between JSON loads and DOMContentLoaded event
-var svg, gamedata, mapstatus, resetPanZoom
-
-// Similar to jQuery's $(document).ready()
-document.addEventListener("DOMContentLoaded", function(event) { 
-  console.log("DOMContentLoaded event fired");
-
-    // Add svg element and assign to var
-    svg = d3.select('svg#map')
-       .attr('width', '100%')
-       .attr('height', '100%')
-       // from https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js and http://bl.ocks.org/sgruhier/1d692762f8328a2c9957
-       .call(d3.behavior.zoom().on("zoom", function () {
-           svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-       }))
-       .append("g");
-
-    mapstatus = d3.select('div#mapstatus').text('Loading map data')
-});
-
-// load map json file
-d3.json("civmap.json", function(error, gamedata){
-    if (error) {
-        mapstatus.text('ERROR while loading map data')
-        return console.warn(error);
-    }
-    else
-        mapstatus.text('Map data loaded')
-        console.log("civmap.json load completed");
-
-    // Just making sure I have the data
-    console.log(gamedata.tile.length); 
-    console.log(gamedata.width); 
-    console.log(gamedata.height); 
-
-    // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
-    var nonSpoilerTiles = gamedata.tile
-        .map(function(d, i){
-            return d.is_visible_to_flags & spoilmask ? { i: i, d: d } : null;
-        })
-        .filter(function(d){ return d != null; })
-
-    var x = function(i){
-       // tile-width * map width, aslo add half-tile offset to the right for odd rows
-       return 128 * (i % (gamedata.width / 2)) + 64 * ( Math.floor(i / (gamedata.width /2)) % 2);
-    }
-    var y = function(i){
-       return 32 * Math.floor(i / (gamedata.width / 2));
-    }
-
-    resetPanZoom = function() {
-        myx = 4 * 64 - x(gamedata.start_loc[1])
-        myy = 4 * 32 - y(gamedata.start_loc[1])
-        // This changes the view, but then zooming or panning with mouse reesets to where it wsa
-        svg.attr("transform", "translate(" + myx + ", " + myy + ")" + " scale(1)");
-        d3.behavior.zoom().translate([myx, myy]).scale(1); // .attr("transform", "translate(" + ( - x(gamedata.start_loc[1])) + ", " + ( - y(gamedata.start_loc[1])) + ")" + " scale(1)")
-        //d3.behavior.zoom().event(svg.transition().duration(500));
-    }
-    resetPanZoom();
-
-    // Adds tiles to the DOM
-    var tiles = svg.append('g').attr('id', 'baseTerrain')
-    tiles.selectAll('polygon').data(nonSpoilerTiles, function(d){ return d.i;})
-        .enter()
-        .append('polygon')
-        .attr('points', '0,32 64,0 128,32 64,64')
-        // Set transforms for tiles
-        .attr('transform', function(d, i) {
-            return 'translate(' + x(d.i).toString() + ',' + y(d.i).toString() + ')'
-        })
-        // Assign class based on terrain
-        .attr('class', function(d, i) {
-            // including itentify flood plains
-            return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
-         });
-
-    // Rivers
-    var rivers = svg.append('g').attr('id', 'rivers')
-            .attr('class', 'river')
-
-    // Currently this draws rivers for every tile then deletes the inappropriate ones
-    var addRivers = function(selection, x1, y1, x2, y2, mask) {
-        // Since running for each edge of tile, have to append a group else it will try to merge with the previous run and see the data is the same and create nothing
-        selection.append('g').attr('id', 'river-0x' + mask.toString(16) ).selectAll('line')
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.rivers & mask; }), function(d){ return d.i; })
-            .enter()
-            .append('line')
-            .attr('x1', function(d, i) { return x(d.i) + x1})
-            .attr('y1', function(d, i) { return y(d.i) + y1 })
-            .attr('x2', function(d, i) { return x(d.i) + x2 })
-            .attr('y2', function(d, i) { return y(d.i) + y2});
-    }
-
-    // NW river
-    addRivers(rivers, 0, 32, 64, 0, 0x80);
-    // NE river
-    addRivers(rivers, 64, 0, 128, 32, 0x02);
-    // SE river
-    addRivers(rivers, 128, 32, 64, 64, 0x08);
-    // SW river
-    addRivers(rivers, 64, 64, 0, 32, 0x20);
-
-    // Add overlay to map
-    var terrainOverlay = svg.append('g').attr('id', 'terrainOverlay').attr('class', 'terroverlay');
-
-    terrainOverlay.selectAll('use')
-        .data(nonSpoilerTiles.filter(function(d){ return overlay[d.d.terrain & 0xf0]; }), function(d){ return d.i; })
-        .enter().append('use')
-        .attr('class', 'terroverlay')
-        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.terrain) & 0Xf0]})
-        .attr('x', function(d, i) { return x(d.i)})
-        .attr('y', function(d, i) { return y(d.i)});
-
-    var bonusGrassland = svg.append('g').attr('id', 'bonusGrassland');
-    bonusGrassland.selectAll('use')
-        // Select tiles with bg flag set, but omit tiles with overlay terrain (trees, hills, mountains, etc.)
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.terrain_features & 0x1 & ! overlay[(d.d.terrain) & 0Xf0]; }), function(d){ return d.i; })
-        .enter().append('use')
-        .attr('xlink:xlink:href', '#bonusgrassland')
-        .attr('x', function(d, i) { return x(d.i)})
-        .attr('y', function(d, i) { return y(d.i)});
-
-    // Add resources to map
-    var mapResources = svg.append('g').attr('id', 'resources').attr('class', 'terroverlay');
-    mapResources.selectAll('text')
-        .data(nonSpoilerTiles.filter(function(d){ return resources[d.d.resource]; }), function(d){ return d.i; })
-        .enter()
-        .append('text')
-        .attr('class', 'resource')
-        .attr('x', function(d, i) { return x(d.i) + 64})
-        .attr('y', function(d, i) { return y(d.i) + 32 })
-        .text(function(d){ return resources[d.d.resource] });
-
-    var cities = svg.append('g').attr('id', 'cities');
-    cities.selectAll('use')
-        // Select tiles with bg flag set, but omit tiles with overlay terrain (trees, hills, mountains, etc.)
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.city_id; }), function(d){ return d.i; })
-        .enter().append('use')
-        .attr('xlink:xlink:href', '#myCity')
-        .attr('x', function(d, i) { return x(d.i)})
-        .attr('y', function(d, i) { return y(d.i)});
-
-});
-</script>
 </head>
 <body>
   <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
   <div id="mapstatus"></div>
-  <svg id="map">
+  <svg id="map" width="100%" height="100%">
   <defs>
  <svg xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -550,6 +360,62 @@ d3.json("civmap.json", function(error, gamedata){
   <circle id="bonusgrassland" cx="64" cy="32" r="3" fill="lightgray" />
 </svg>
   </defs>
+  <polygon points="0,32 64,0 128,32 64,64" class="terrbase2"></polygon>
   </svg>
+<script>
+(function(){
+    var resources = {
+        0x08: '\uD83C\uDF47', // "#myWines" 
+        0x09: 'Furs', // Furs
+        0x0c: 'Spices', // Spices
+        0x0d: '\uD83D\uDC18', // Unicode elephant // Ivory
+        0x0a: 'Dyes', // Dyes
+        0x0b: 'Incense', // Incense
+        0x0e: 'Silks', // Silks
+        0x0f: '\uD83D\uDC8E', // Gems
+        // 0x10: '\uD83D\uDC33', // Spouting whale // Whales
+        0x10: '\uD83D\uDC0B', // Whales
+        0x11: '\uD800\uDC82', // Deer
+        0x12: '\uD83D\uDC1F', // Fish
+        0x13: '\uD83D\uDC04', // Cow
+        0x14: 'Wheat', // Wheat
+        0x15: 'Gold', // Gold
+        0x16: 'Sugar', // Sugar
+        0x17: '\uD83C\uDF4C', // Trop.Fruit
+        // 0x18: '\uD83C\uDFDD', // Unicode desert island // Oasis
+        // 0x18: 'Oasis', // Oasis
+        0x18: '\uD83C\uDF34', // Unicode palm tree // Oasis
+        // 0x19: 'Tobacco' // Tobacco
+        0x19: '\uD83D\uDEAC' // Unicode smoking // Tobacco
+    }
+    // console.log('Resource object test:');
+    // Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
+
+    var overlay = {
+        0x50: '#myHill',
+        0x60: '#myMountain',
+        0x70: '#myForest',
+        0x80: '#myJungle',
+        0x90: '#myMarsh',
+        0xa0: '#myVolcano'
+    }
+
+    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
+    var spoilmask = 0x2;
+    // spoilmask = 0x4;
+    // spoilmask = 0x8;
+    // spoilmask = 0x10;
+    // spoilmask = 0xffff;
+
+    var x = function(i){
+       // tile-width * map width, also add half-tile offset to the right for odd rows
+       return 128 * (i % (gamedata.width / 2)) + 64 * ( Math.floor(i / (gamedata.width /2)) % 2);
+    }
+    var y = function(i){
+       return 32 * Math.floor(i / (gamedata.width / 2));
+    }
+    console.log("Hi");
+})();
+</script>
 </body>
 </html>
