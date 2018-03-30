@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>Civ3 Show-and-Tell JSON/d3/SVG Map</title>
+  <title>One Turn Deserves Another III</title>
   <link rel="stylesheet" type="text/css" href="svgmap.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 </head>
-<body>
-  <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
-  <div id="mapstatus"></div>
+<body ng-app="otda3" ng-controller="Otda3 as game">
+  <h1>One Turn Deserves Another III</h1>
   <svg id="map" width="100%" height="100%">
   <defs>
  <svg xmlns="http://www.w3.org/2000/svg"
@@ -360,10 +360,12 @@
   <circle id="bonusgrassland" cx="64" cy="32" r="3" fill="lightgray" />
 </svg>
   </defs>
-  <polygon points="0,32 64,0 128,32 64,64" class="terrbase2"></polygon>
+  <polygon ng-repeat="tile in game.mapTiles track by $index" transform="translate({{ game.x($index)}},{{ game.y($index)}})" points="0,32 64,0 128,32 64,64" class="terrbase2"></polygon>
   </svg>
 <script>
 (function(){
+    'use strict';
+
     var resources = {
         0x08: '\uD83C\uDF47', // "#myWines" 
         0x09: 'Furs', // Furs
@@ -407,14 +409,27 @@
     // spoilmask = 0x10;
     // spoilmask = 0xffff;
 
-    var x = function(i){
-       // tile-width * map width, also add half-tile offset to the right for odd rows
-       return 128 * (i % (gamedata.width / 2)) + 64 * ( Math.floor(i / (gamedata.width /2)) % 2);
+
+    angular
+        .module('otda3', [])
+        .controller('Otda3', Otda3);
+
+    //   Otda3.$inject = [];
+
+    function Otda3() {
+        var vm = this;
+        var width = 20;
+        var height = 20;
+        vm.mapWidth = width;
+        vm.mapTiles = [...Array(width/2*height)];
+        vm.x = function(i){
+            // tile-width * map width, also add half-tile offset to the right for odd rows
+            return 128 * (i % (vm.mapWidth / 2)) + 64 * ( Math.floor(i / (vm.mapWidth /2)) % 2);
+        }
+        vm.y = function(i){
+            return 32 * Math.floor(i / (vm.mapWidth / 2));
+        }
     }
-    var y = function(i){
-       return 32 * Math.floor(i / (gamedata.width / 2));
-    }
-    console.log("Hi");
 })();
 </script>
 </body>
