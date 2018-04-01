@@ -3,11 +3,13 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
+import { MapSvgComponent } from './map-svg/map-svg.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MapSvgComponent
   ],
   imports: [
     BrowserModule
