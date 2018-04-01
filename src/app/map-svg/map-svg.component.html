@@ -1,3 +1,8 @@
 <p>
   map-svg works!
 </p>
+<svg width="100%" height="100%">
+  <svg:polygon *ngFor="let tile of tiles; let i = index"
+  points="0,32 64,0 128,32 64,64"
+  [attr.transform]="'translate(' + mapDataService.x(i).toString() + ',' + mapDataService.y(i).toString() + ')'" />
+</svg>

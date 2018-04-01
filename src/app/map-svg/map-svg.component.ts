@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapDataService } from '../map-data.service';
+import { MapTile } from '../../map';
 
 @Component({
   selector: 'app-map-svg',
@@ -11,6 +12,10 @@ export class MapSvgComponent implements OnInit {
   constructor(public mapDataService: MapDataService) { }
 
   ngOnInit() {
+    this.mapDataService.newMap();
+    this.mapDataService.getTiles()
+      .subscribe(tiles => this.tiles = tiles)
   }
 
+  tiles: MapTile[];
 }
