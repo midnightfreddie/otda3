@@ -1,0 +1,11 @@
+svg {
+    background: #333333;
+}
+
+polygon {
+    fill: #9C9C39;
+    /* for gridlines */
+    stroke: black;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
