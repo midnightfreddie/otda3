@@ -1,5 +1,6 @@
 <svg width="1344" height="672">
   <svg:polygon *ngFor="let tile of tiles; let i = index"
   points="0,32 64,0 128,32 64,64"
-  [attr.transform]="'translate(' + mapDataService.x(i).toString() + ',' + mapDataService.y(i).toString() + ')'" />
+  [attr.transform]="'translate(' + x(i).toString() + ',' + y(i).toString() + ')'" />
+  <svg:text x="50" y="38" font-size="32">⛹</svg:text>
 </svg>

@@ -18,4 +18,10 @@ export class MapSvgComponent implements OnInit {
   }
 
   tiles: MapTile[];
+  x(i): number {
+    return this.mapDataService.x(i);
+  }
+  y(i): number {
+    return this.mapDataService.y(i);
+  }
 }
