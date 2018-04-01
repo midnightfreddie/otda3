@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MapDataService } from '../map-data.service';
 
 @Component({
   selector: 'app-map-svg',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MapSvgComponent implements OnInit {
 
-  constructor() { }
+  constructor(public mapDataService: MapDataService) { }
 
   ngOnInit() {
   }
