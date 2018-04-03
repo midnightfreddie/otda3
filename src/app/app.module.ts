@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { MapSvgComponent } from './map-svg/map-svg.component';
 import { MapDataService } from './map-data.service';
+import { UnitDataService } from './unit-data.service';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { MapDataService } from './map-data.service';
     BrowserModule
   ],
   providers: [
-    MapDataService
+    MapDataService,
+    UnitDataService
   ],
   bootstrap: [AppComponent]
 })
