@@ -9,3 +9,10 @@ polygon {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
+
+text {
+    text-anchor: middle;
+    /* alignment-baseline: central; */
+    dominant-baseline: central;
+    font-size: 40px;
+}
