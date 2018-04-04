@@ -35,15 +35,6 @@ export class MapDataService {
     let x = i % (this.width / 2) * 2;
     let y = Math.floor(i / (this.width / 2));
     if (y % 2 == 1) { x = x + 1 }
-    // destinations.push((i + 2) % (this.width / 2));
-    // destinations.push((i - 2) % (this.width / 2));
-    // destinations.push((i + 2) % (this.width / 2));
-    // destinations.push((i + 2) % (this.width / 2));
-    // destinations.push(x);
-    // destinations.push(y);
-    // destinations.push(i);
-    // destinations.push((x + 1) % (this.width / 2) + Math.floor(this.width / 2) * y);
-    // destinations.push((x + this.width - 1) % (this.width / 2) + Math.floor(this.width / 2) * y);
     destinations.push(this.addXY(x, y, 2, 0));
     destinations.push(this.addXY(x, y, -2, 0));
     destinations.push(this.addXY(x, y, 1, 1));
@@ -60,5 +51,3 @@ export class MapDataService {
     return newI;
   }
 }
-
-// function 
