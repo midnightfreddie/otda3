@@ -24,6 +24,7 @@ export class MapSvgComponent implements OnInit {
 
   tiles: MapTile[];
   units: Unit[];
+  temp: number[];
 
   x(i): number {
     return this.mapDataService.x(i);
@@ -32,6 +33,10 @@ export class MapSvgComponent implements OnInit {
     return this.mapDataService.y(i);
   }
   moveUnit(unit): void {
-    this.unitDataService.moveUnit(unit);
+    // this.unitDataService.moveUnit(unit);
+    let moves = this.mapDataService.moves(unit.i);
+    console.log(moves);
+    unit.i = moves[4];
+    this.temp = this.mapDataService.moves(unit.i);
   }
 }

@@ -30,4 +30,35 @@ export class MapDataService {
   y(i): number {
       return 32 * Math.floor(i / (this.width / 2));
   }
+  moves(i): number[] {
+    let destinations = [];
+    let x = i % (this.width / 2) * 2;
+    let y = Math.floor(i / (this.width / 2));
+    if (y % 2 == 1) { x = x + 1 }
+    // destinations.push((i + 2) % (this.width / 2));
+    // destinations.push((i - 2) % (this.width / 2));
+    // destinations.push((i + 2) % (this.width / 2));
+    // destinations.push((i + 2) % (this.width / 2));
+    // destinations.push(x);
+    // destinations.push(y);
+    // destinations.push(i);
+    // destinations.push((x + 1) % (this.width / 2) + Math.floor(this.width / 2) * y);
+    // destinations.push((x + this.width - 1) % (this.width / 2) + Math.floor(this.width / 2) * y);
+    destinations.push(this.addXY(x, y, 2, 0));
+    destinations.push(this.addXY(x, y, -2, 0));
+    destinations.push(this.addXY(x, y, 1, 1));
+    destinations.push(this.addXY(x, y, -1, 1));
+    destinations.push(this.addXY(x, y, 1, -1));
+    destinations.push(this.addXY(x, y, -1, -1));
+    destinations.push(this.addXY(x, y, 0, 2));
+    destinations.push(this.addXY(x, y, 0, -2));
+    return destinations;
+  }
+  private addXY (x, y, dx, dy) : number {
+    let newI = Math.floor((x + this.width + dx) / 2) % (this.width / 2) +
+      Math.floor(this.width / 2) * ((y + this.width + dy) % this.width);
+    return newI;
+  }
 }
+
+// function 

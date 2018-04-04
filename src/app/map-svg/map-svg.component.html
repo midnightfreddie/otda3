@@ -2,6 +2,10 @@
   <svg:polygon *ngFor="let tile of tiles; let i = index"
   points="0,32 64,0 128,32 64,64"
   [attr.transform]="'translate(' + x(i).toString() + ',' + y(i).toString() + ')'" />
+  <svg:polygon *ngFor="let foo of temp; let i = index"
+  points="0,32 64,0 128,32 64,64"
+  style="fill: blue;"
+  [attr.transform]="'translate(' + x(foo).toString() + ',' + y(foo).toString() + ')'" />
   <svg:text *ngFor="let unit of units; let i = index"
     [attr.x]="x(unit.i) + 64"
     [attr.y]="y(unit.i) + 32"
