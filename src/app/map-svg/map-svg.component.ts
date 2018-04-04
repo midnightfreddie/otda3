@@ -3,6 +3,7 @@ import { MapDataService } from '../map-data.service';
 import { MapTile } from '../../map';
 import { Unit } from '../../unit';
 import { UnitDataService } from '../unit-data.service';
+import {Observable} from "rxjs"; // FIXME: temp logic in component
 
 @Component({
   selector: 'app-map-svg',
@@ -18,8 +19,13 @@ export class MapSvgComponent implements OnInit {
     this.mapDataService.getTiles()
       .subscribe(tiles => this.tiles = tiles);
     this.unitDataService.spawnUnit();
+    this.unitDataService.spawnUnit();
+    this.unitDataService.spawnUnit();
     this.unitDataService.getUnits()
       .subscribe(units => this.units = units);
+    // FIXME: temp interval to move units around
+    let t= Observable.interval(500);
+    t.subscribe(i => this.moveUnit(this.units[i % this.units.length]));
   }
 
   tiles: MapTile[];
