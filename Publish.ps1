@@ -14,4 +14,4 @@ ng build --prod --build-optimizer --deploy-url="$DeployUrl"
 
 aws s3 sync $PSScriptRoot\dist\ s3://midnightfreddie-public-static-files/otda3.com$DeployUrl
 
-"Deployed to https://www.otda3.com$DeployUrl"
+"Deployed to https://www.otda3.com$DeployUrl/"
