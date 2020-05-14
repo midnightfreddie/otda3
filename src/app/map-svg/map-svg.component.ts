@@ -3,7 +3,7 @@ import { MapDataService } from '../map-data.service';
 import { MapTile } from '../../map';
 import { Unit } from '../../unit';
 import { UnitDataService } from '../unit-data.service';
-import {Observable} from "rxjs"; // FIXME: temp logic in component
+import { Observable, interval } from 'rxjs'; // FIXME: temp logic in component
 
 @Component({
   selector: 'app-map-svg',
@@ -11,6 +11,9 @@ import {Observable} from "rxjs"; // FIXME: temp logic in component
   styleUrls: ['./map-svg.component.css']
 })
 export class MapSvgComponent implements OnInit {
+
+  tiles: MapTile[];
+  units: Unit[];
 
   constructor(public mapDataService: MapDataService, public unitDataService: UnitDataService) { }
 
@@ -24,12 +27,9 @@ export class MapSvgComponent implements OnInit {
     this.unitDataService.getUnits()
       .subscribe(units => this.units = units);
     // FIXME: temp interval to move units around
-    let t= Observable.interval(500);
+    const t = interval(500);
     t.subscribe(i => this.moveUnit(this.units[i % this.units.length]));
   }
-
-  tiles: MapTile[];
-  units: Unit[];
 
   x(i): number {
     return this.mapDataService.x(i);
@@ -39,7 +39,7 @@ export class MapSvgComponent implements OnInit {
   }
   moveUnit(unit): void {
     // this.unitDataService.moveUnit(unit);
-    let moves = this.mapDataService.moves(unit.i);
+    const moves = this.mapDataService.moves(unit.i);
     unit.i = moves[Math.floor(Math.random() * moves.length)];
   }
 }
