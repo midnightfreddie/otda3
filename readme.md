@@ -1,7 +1,3 @@
-## Updating in progress
-
-2020-05-13: Following https://update.angular.io/#5.2:9.0 to try to upgrade Angular 5 to Angular 9, and hopefully get rid of all these dependencies with security issues.
-
 # One Turn Deserves Another III
 
 An idea for a game that is really an excuse to toy around with Angular 2+, reactive programming, and perhaps some other toys.
@@ -14,3 +10,5 @@ Ideas and progress on this may be found at https://forums.civfanatics.com/thread
 npm install
 npm run ng serve
 ```
+
+Updated to Angular 9. The main code is working, but the tests seem to need changes. Offhand I'm not sure the tests are actually testing or if they were Angular boilerplate.

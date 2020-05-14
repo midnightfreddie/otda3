@@ -14,10 +14,10 @@ export class UnitDataService {
   }
 
   spawnUnit(): void {
-    if (typeof this.units == 'undefined') {
+    if (typeof this.units === 'undefined') {
       this.units = [];
     }
-    let unit = new Unit;
+    const unit = new Unit;
     unit.health = 2;
     unit.rank = 2;
     this.moveUnit(unit);
